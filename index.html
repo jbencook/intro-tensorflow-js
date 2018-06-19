@@ -529,6 +529,7 @@
             ```javascript
             function project(points, projectionMatrix) {
               shape = points.shape;
+              // Just unroll the tensor and do the same thing as before
               reshapedPoints = points.reshape([-1, ...shape.slice(-1)]);
               n = reshapedPoints.shape[0];
               padded = tf.concat([reshapedPoints, tf.ones([n, 1])], -1);
