@@ -163,9 +163,9 @@
             x_tensor = tf.tensor(x);
 
             function timeMe(callback) {
-              const tic = Date.now();
+              tic = Date.now();
               callback();
-              const toc = Date.now() - tic;
+              toc = Date.now() - tic;
               console.log(toc);
             }
             ```
@@ -175,10 +175,10 @@
             18
 
             > timeMe(() => x_tensor.add(x_tensor));
-            0
+            26
 
-            > timeMe(() => x_tensor.add(x_tensor).dataSync());
-            6
+            > timeMe(() => x_tensor.add(x_tensor));  // do it again
+            0
             ```
             <!-- .element: class="fragment" -->
           </script>
