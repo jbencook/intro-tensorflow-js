@@ -393,19 +393,21 @@
             x = tf.ones([2, 3, 4]);
 
             // mask = np.array([True, False, True])
-            // x[:, mask].shape
+            // x[:, mask]
             mask = [true, false, true];  // no good tensor-only solution
             masked = tf.unstack(x, 1).filter((_, i) => mask[i])
+            masked = tf.stack(masked, 1);
 
-            // x[[0, 1, 1, 1]].shape
+            // x[[0, 1, 1, 1]]
             indices = tf.tensor1d([0, 1, 1, 1], 'int32');
+            gatheredX = tf.gather(x, indices);
             ```
 
             ```javascript
-            > tf.stack(masked, 1).shape;
+            > masked.shape
             [2, 2, 4]
 
-            > tf.gather(x, indices).shape;
+            > gatheredX.shape;
             [4, 3, 4]
 
             > x.slice([0, 0, 0], [-1, -1, 2]).shape;  // x[..., slice(0, 2)].shape
