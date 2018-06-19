@@ -1,0 +1,637 @@
+<!doctype html>
+<html>
+	<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.6"> </script>
+    <script src="./sizeof.js"> </script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+        <section data-markdown id="quick-start">
+            <script type="text/template">
+            #### Quick Start
+            ```javascript
+            import * as tf from '@tensorflow/tfjs-core';
+
+            let x = tf.tensor([[1, 2], [3, 4]]);
+            ```
+
+            ```javascript
+            > x.print();
+            Tensor
+                [[1, 2],
+                [3, 4]]
+
+            > x
+            Tensor {
+              isDisposedInternal: false,
+              size: 4,
+              shape: [ 2, 2 ],
+              dtype: 'float32',
+              strides: [ 2 ],
+              dataId: {},
+              id: 0,
+              rankType: '2' }
+
+            > x.dataSync();
+            Float32Array [ 1, 2, 3, 4 ]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="elementwise-1">
+            <script type="text/template">
+            #### Elementwise Everything I
+            ```javascript
+            x = tf.tensor([1, 2, 3]);
+            y = tf.tensor([2, 3, 6]);
+            ```
+
+            ```javascript
+            > x.add(y).print();  // this is cool
+            Tensor
+              [3, 5, 9]
+
+            > x + y;  // don't do this
+            "Tensor
+              [1, 2, 3]Tensor
+              [2, 3, 6]"
+            
+            > x + 10;  // or this
+            "Tensor
+              [1, 2, 3]10"
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="elementwise-2">
+            <script type="text/template">
+            #### Elementwise Everything II
+            ```javascript
+            x = tf.tensor([
+              [1, 2, 3],
+              [4, 5, 6]
+            ]);
+            y = tf.tensor([
+              [10, 20, 30],
+              [40, 50, 60]
+            ]);
+            ```
+
+            ```javascript
+            > x.mul(y).print();
+            Tensor
+              [[10 , 40 , 90 ],
+              [160, 250, 360]]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="size">
+            <script type="text/template">
+            #### Size
+            ```javascript
+            n = 1e5;
+            x = [];
+            for (let i = 0; i < n; i++) x.push(i);
+            x_tensor = tf.tensor(x);
+            ```
+
+            ```javascript
+            > sizeof(x);
+            1777780
+
+            > sizeof(x_tensor);  // a tensor is just a view
+            156
+
+            > sizeof(x_tensor.dataSync());
+            1777780
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="speed">
+            <script type="text/template">
+            #### Speed
+            ```javascript
+            n = 1e5;
+            x = [];
+            for (let i = 0; i < n; i++) x.push(i);
+            x_tensor = tf.tensor(x);
+
+            function timeMe(callback) {
+              const tic = Date.now();
+              callback();
+              const toc = Date.now() - tic;
+              console.log(toc);
+            }
+            ```
+
+            ```javascript
+            > timeMe(() => x.map(element => element + element));
+            18
+
+            > timeMe(() => x_tensor.add(x_tensor));
+            0
+
+            > timeMe(() => x_tensor.add(x_tensor).dataSync());
+            6
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="syntax">
+            <script type="text/template">
+            #### Syntax
+            ```javascript
+            x = tf.linspace(0, 9, 10);  // Notice no arange
+            y = tf.linspace(0, 23, 24).reshape([2, 3, 4]);
+            z = tf.linspace(0, 5, 6).reshape([2, 3, 1]);
+            ```
+
+            ```javascript
+            > x.add(tf.scalar(10)).print();
+            Tensor
+              [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+
+            > y.add(z).print();
+            Tensor
+              [[[0 , 1 , 2 , 3 ],
+                [5 , 6 , 7 , 8 ],
+                [10, 11, 12, 13]],
+          
+              [[15, 16, 17, 18],
+                [20, 21, 22, 23],
+                [25, 26, 27, 28]]]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="dtypes">
+            <script type="text/template">
+            #### dtypes
+            ```javascript
+            // We get 3 dtypes
+            x_floats = tf.tensor1d([1, 2, 3, 4]);  // Default to float32
+            x_ints = tf.tensor1d([1, 2, 3, 4], 'int32');
+            x_bools = tf.tensor1d([0, 1, 0, 1], 'bool');
+            ```
+
+            ```javascript
+            > x_floats.dtype;
+            "float32"
+
+            > x_ints.dtype;
+            "int32"
+
+            > x_bools.dtype;
+            "bool"
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="make-arrays">
+            <script type="text/template">
+            #### Make Arrays
+            ```javascript
+            x = tf.ones([3, 1], 'int32');
+            y = tf.zerosLike(x);
+            y2 = tf.zerosLike(x, 'bool');
+            ```
+
+            ```javascript
+            > tf.linspace(0, 10, 3).print();
+            Tensor
+              [0, 5, 10]
+
+            > x.print();
+            Tensor
+              [[1],
+               [1],
+               [1]]
+
+            > y.print();
+            Tensor
+              [[0],
+               [0],
+               [0]]
+
+            > y.dtype;
+            "int32"
+            
+            > y2.dtype;  // Turns out there's no dtype argument
+            "int32"
+
+            > tf.fill([10], NaN).print();
+            Tensor
+              [NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="axes">
+            <script type="text/template">
+            #### Axes
+            ```javascript
+            x = tf.tensor([
+              [1, 2],
+              [3, 4]
+            ]);
+            ```
+
+            ```javascript
+            > x.sum().print();
+            Tensor
+              10
+
+            > x.sum(0).print();
+            Tensor
+              [4, 6]
+
+            > x.sum(1).print();
+            Tensor
+              [3, 7]
+
+            > x.max(-1).print();
+            Tensor
+              [2, 4]
+
+            > tf.setBackend('cpu');  // beware of bugs
+            > x = tf.tensor([
+                [1, 2],
+                [3, 4]
+              ]);
+            > x.min(0).print();
+            Tensor
+              [1, 1]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="stacks">
+            <script type="text/template">
+            #### Stacks on stacks
+            ```javascript
+            x = tf.zeros([3, 2, 1]);
+            y = tf.zeros([3, 2, 1]);
+            ```
+
+            ```javascript
+            > tf.concat([x, y], 0).shape
+            [6, 2, 1]
+
+            > tf.concat([x, y], 1).shape
+            [3, 4, 1]
+
+            > tf.concat([x, y], -1).shape
+            [3, 2, 2]
+
+            > tf.stack([x, y], -1).shape
+            [3, 2, 1, 2]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="nan">
+            <script type="text/template">
+            #### NaN
+            ```javascript
+            x = tf.tensor([0, 1, NaN, 3, 4, 5]);
+
+            // like nanmean, but more verbose!
+            mask = tf.less(x, tf.scalar(Number.MAX_SAFE_INTEGER)).asType('float32');
+            masked = tf.where(mask.asType('bool'), x, tf.zerosLike(x));
+            mean = masked.mul(mask).sum().div(mask.sum());
+            ```
+
+            ```javascript
+            > x.mean().print();
+            Tensor
+              NaN
+
+            > mean.print();
+            Tensor
+              2.6000001430511475
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="slices-1">
+            <script type="text/template">
+            #### Slices I
+            ```javascript
+            x = tf.ones([2, 3, 4]);
+
+            axis0 = x.slice([0], [1]);  // x[0].shape
+            axis1 = x.slice([0, 0], [-1, 1]);  // x[:, 0].shape
+            axis2 = x.slice([0, 0, 0], [-1, -1, 1]);  // x[..., 0].shape
+            ```
+
+            ```javascript
+            > axis0.shape;
+            [1, 3, 4]
+
+            > tf.squeeze(axis0).shape;
+            [3, 4]
+
+            > tf.squeeze(axis1).shape;
+            [2, 4]
+
+            > tf.squeeze(axis2).shape;
+            [2, 3]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="slices-2">
+            <script type="text/template">
+            #### Slices II
+            ```javascript
+            x = tf.ones([2, 3, 4]);
+
+            // mask = np.array([True, False, True])
+            // x[:, mask].shape
+            mask = [true, false, true];  // no good tensor-only solution
+            masked = tf.unstack(x, 1).filter((_, i) => mask[i])
+
+            // x[[0, 1, 1, 1]].shape
+            indices = tf.tensor1d([0, 1, 1, 1], 'int32');
+            ```
+
+            ```javascript
+            > tf.stack(masked, 1).shape;
+            [2, 2, 4]
+
+            > tf.gather(x, indices).shape;
+            [4, 3, 4]
+
+            > x.slice([0, 0, 0], [-1, -1, 2]).shape;  // x[..., slice(0, 2)].shape
+            [2, 3, 2]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="slices-3">
+            <script type="text/template">
+            #### Slices III
+            ```javascript
+            x = tf.ones([2, 3, 4]);
+            ```
+
+            ```javascript
+            > x.expandDims().shape;  // Default to batch dimension
+            [1, 2, 3, 4]
+
+            > x.expandDims(3).shape;  // x[..., None].shape
+            [2, 3, 4, 1]
+
+            > x.expandDims(-1).shape;  // Feature or bug?
+            [2, 3, 1, 4]
+
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="do-slices-copy">
+            <script type="text/template">
+            #### Do Slices Copy?
+            ```javascript
+            x = tf.randomNormal([10, 3], 0, 1, 'float32', 12345);
+            firstColumn = x.slice([0, 0], [-1, 1]);
+            data = firstColumn.dataSync();
+            data.fill(0);  // don't actually do this          
+            ```
+
+            ```javascript
+            > firstColumn.print();
+            Tensor
+              [[0],
+               [0],
+               [0],
+               [0],
+               [0],
+               [0],
+               [0],
+               [0],
+               [0],
+               [0]]            
+
+            > x.print();  // I'm not sure why, but they seem to copy
+            Tensor
+              [[-0.6292036, -0.8362318, 0.5298983 ],
+               [-0.7986915, 1.8039397 , -1.9383417],
+               [0.5535187 , 1.1069629 , 0.1965688 ],
+               [-0.010066 , 0.2911729 , 0.0765864 ],
+               [-0.9865822, 1.4696954 , -0.4122119],
+               [-0.9709871, 0.5600157 , 2.0307539 ],
+               [0.9304251 , 2.0432179 , 0.937879  ],
+               [-1.3244417, -0.8587731, -1.1497558],
+               [0.4546188 , 0.4389072 , 1.0185065 ],
+               [0.3647155 , 1.4634407 , -0.9991618]]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="project-matrix-1a">
+            <script type="text/template">
+            #### Project Matrix Ia
+            ```javascript
+            function project(points, projectionMatrix) {
+              n = points.shape[0];
+              padded = tf.concat([points, tf.ones([n, 1])], -1);
+              unscaled = padded.matMul(projectionMatrix.transpose());
+              // Why doesn't unscaled.slice([0, -1], [-1, 1]) work?
+              return unscaled.slice([0, 0], [-1, 2])
+                .div(unscaled.slice([0, 2], [-1, 1]));
+            }
+            ```
+          </script>
+        </section>
+        <section data-markdown id="project-tensor-1b">
+            <script type="text/template">
+            #### Project Matrix Ib
+            ```javascript
+            points = tf.linspace(0, 5, 6).reshape([-1, 2]);
+            points = tf.concat([points, tf.zeros([3, 1])], -1);
+
+            projectionMatrix = tf.tensor([
+              [1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 1],
+            ]);
+            ```
+
+            ```javascript
+            > points.print();
+            Tensor
+              [[0, 1, 0],
+               [2, 3, 0],
+               [4, 5, 0]]
+
+            > project(points, projectionMatrix).print();
+            Tensor
+              [[0, 1],
+               [2, 3],
+               [4, 5]]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="project-tensor-2a">
+            <script type="text/template">
+            #### Project Tensor IIa
+            ```javascript
+            function project(points, projectionMatrix) {
+              shape = points.shape;
+              reshapedPoints = points.reshape([-1, ...shape.slice(-1)]);
+              n = reshapedPoints.shape[0];
+              padded = tf.concat([reshapedPoints, tf.ones([n, 1])], -1);
+              unscaled = padded.matMul(projectionMatrix.transpose());
+              scaled = unscaled.slice([0, 0], [-1, 2])
+                .div(unscaled.slice([0, 2], [-1, 1]));
+              shape[shape.length - 1] = 2;
+              return scaled.reshape(shape);
+            }
+            ```
+          </script>
+        </section>
+        <section data-markdown id="project-matrix-2b">
+            <script type="text/template">
+            #### Project Tensor IIb
+            ```javascript
+            points = tf.linspace(0, 11, 12).reshape([2, 3, 2]);
+            points = tf.concat([points, tf.zeros([2, 3, 1])], -1);
+            projectionMatrix = tf.tensor([
+              [1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 1],
+            ]);
+            projected = project(points, projectionMatrix);
+            ```
+
+            ```javascript
+            > projected.print();
+            Tensor
+              [[[0 , 1 ],
+                [2 , 3 ],
+                [4 , 5 ]],
+          
+               [[6 , 7 ],
+                [8 , 9 ],
+                [10, 11]]]            
+
+            > projected.shape;
+            [2, 3, 2]
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="velocities">
+            <script type="text/template">
+            #### Velocities
+            ```javascript
+            function computeSpeeds(chunk) {
+              x = tf.tensor(chunk.tracking);
+              n = x.shape[0];
+              velocities = x.slice([1], [-1]).sub(x.slice([0], [n - 1]));
+              return tf.norm(velocities, 2, -1).mul(tf.scalar(25));
+            }
+
+            async function getChunk() {
+              return fetch("/sample_chunk.json")
+                .then(response => response.json());
+            }
+            ```
+
+            ```javascript
+            > chunk = await getChunk();
+            > computeSpeeds(chunk).mean().print();
+            Tensor
+              2.0274252891540527
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+        <section data-markdown id="pre-allocation">
+            <script type="text/template">
+            #### Pre-Allocation
+            ```javascript
+            function someComplicatedFunction(arraySoFar, element) {
+              if (element === 0)
+                return 0
+              else
+                return arraySoFar.slice(0, element)
+                  .reduce((a, b) => a + b) * element;
+            }
+            
+            const n = 10000;
+            
+            // Using JavaScript array
+            tic1 = Date.now();
+            data = [];
+            for (let i = 0; i < n; i++) {
+              data.push(someComplicatedFunction(data, i));
+            }
+            x = tf.tensor(data);
+            toc1 = Date.now() - tic1;
+            
+            // Pre-allocation with TypedArray
+            tic2 = Date.now();
+            data = new Float32Array(n);
+            for (let i = 0; i < n; i++) {
+              data[i] = someComplicatedFunction(data, i);
+            }
+            x = tf.tensor(data);
+            toc2 = Date.now() - tic2;
+            ```
+
+            ```javascript
+            > toc1
+            227
+
+            > toc2
+            1066
+            ```
+            <!-- .element: class="fragment" -->
+          </script>
+        </section>
+			</div>
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'reveal.js/plugin/markdown/marked.js' },
+					{ src: 'reveal.js/plugin/markdown/markdown.js' },
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
