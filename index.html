@@ -485,7 +485,8 @@
               n = points.shape[0];
               padded = tf.concat([points, tf.ones([n, 1])], -1);
               unscaled = padded.matMul(projectionMatrix.transpose());
-              // Why doesn't unscaled.slice([0, -1], [-1, 1]) work?
+              // Why doesn't unscaled.slice([0, -1], [-1, 1]) do the same
+              // thing as unscaled.slice([0, 2], [-1, 1])?
               return unscaled.slice([0, 0], [-1, 2])
                 .div(unscaled.slice([0, 2], [-1, 1]));
             }
