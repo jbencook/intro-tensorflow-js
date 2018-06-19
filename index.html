@@ -262,7 +262,7 @@
             > y.dtype;
             "int32"
             
-            > y2.dtype;  // Turns out there's no dtype argument
+            > y2.dtype;  // Oops. No dtype arg in tf.zerosLike
             "int32"
 
             > tf.fill([10], NaN).print();
