@@ -344,7 +344,7 @@
             // like nanmean, but more verbose!
             mask = tf.less(x, tf.scalar(Number.MAX_SAFE_INTEGER)).asType('float32');
             masked = tf.where(mask.asType('bool'), x, tf.zerosLike(x));
-            mean = masked.mul(mask).sum().div(mask.sum());
+            nanMean = masked.mul(mask).sum().div(mask.sum());
             ```
 
             ```javascript
@@ -352,7 +352,7 @@
             Tensor
               NaN
 
-            > mean.print();
+            > nanMean.print();
             Tensor
               2.6000001430511475
             ```
