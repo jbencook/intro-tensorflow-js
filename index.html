@@ -193,11 +193,11 @@
             ```
 
             ```javascript
-            > x.add(tf.scalar(10)).print();
+            > x.add(tf.scalar(10)).print();  // No object-number ops
             Tensor
               [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-            > y.add(z).print();
+            > y.add(z).print();  // No operator overloading
             Tensor
               [[[0 , 1 , 2 , 3 ],
                 [5 , 6 , 7 , 8 ],
