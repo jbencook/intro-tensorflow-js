@@ -7,5 +7,5 @@ You can follow along by pasting code snippets into the developer console.
 ## Dependencies
 
 * TensorFlow.js @11.6
-* reaveal.js @3.6.0
+* reveal.js @3.6.0
 * object-sizeof @1.2.0 (browserified)
